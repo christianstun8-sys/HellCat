@@ -74,6 +74,7 @@ class Leveling(commands.Cog):
         self.bot.loop.create_task(self.setup_db())
         self.voice_xp_task.start()
 
+
     async def setup_db(self):
         self.db = await aiosqlite.connect(self.db_name)
         await self.db.execute("""

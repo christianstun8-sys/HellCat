@@ -15,6 +15,7 @@ class HellCat(commands.Bot):
         os.makedirs("databases", exist_ok=True)
         os.makedirs("data", exist_ok=True)
 
+
     async def setup_hook(self):
         done = True
 

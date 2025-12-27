@@ -16,8 +16,6 @@ class Synccommand(commands.Cog):
             color=discord.Color.light_grey(),
         )
 
-
-
         await ctx.send(embed=loading_embed)
 
         try:

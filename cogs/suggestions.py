@@ -26,7 +26,6 @@ async def init_db():
                          """)
         await db.commit()
 
-
 async def update_vote(interaction: discord.Interaction, message_id: int, new_vote: int):
     uid = interaction.user.id
     now = time.time()

@@ -8,6 +8,7 @@ TARGET_GUILDS = [
     channels.INFINITY_EMPIRE.guild_id
 ]
 
+
 class UniversalBan(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

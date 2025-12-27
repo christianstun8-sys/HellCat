@@ -74,6 +74,5 @@ ALL_GUILDS = {
     INFINITY_EMPIRE.guild_id: INFINITY_EMPIRE,
 }
 
-
 def get_config(guild_id: int) -> GuildConfig | None:
     return ALL_GUILDS.get(guild_id)

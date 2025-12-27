@@ -164,6 +164,7 @@ class RoleSelectView(discord.ui.View):
         except Exception as e:
             await interaction.response.send_message(f"Ein Fehler ist aufgetreten: {e}", ephemeral=True)
 
+
 class RolePanel(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot

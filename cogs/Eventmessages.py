@@ -65,6 +65,7 @@ class ByeMessage(commands.Cog):
 
             await guild.system_channel.send(embed=bembed)
 
+
 class BoostMessage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
