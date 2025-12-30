@@ -7,7 +7,7 @@ beta = False
 crashed = False
 
 dotenv.load_dotenv()
-if beta:
+if beta == True:
     TOKEN = os.getenv("DISCORD_BETA_TOKEN")
 elif beta == False:
     TOKEN = os.getenv("DISCORD_TOKEN")

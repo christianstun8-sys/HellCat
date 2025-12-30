@@ -52,18 +52,18 @@ HOUSE_OF_DEMONS = GuildConfig(
 
 NACHTBUS = GuildConfig(
     guild_id=1363137083148865598,
-    open_category_id=1,
-    claimed_category_id=2,
-    closed_category_id=3,
+    open_category_id=1455657508432642199,
+    claimed_category_id=1455657541244682240,
+    closed_category_id=1455657528380756191,
     log_channel_id=1411140003874213948,
     team_role_id=1363149195279732829,
     admin_role_id=1363148778370240702,
     member_role_id=1363152209164107826,
-    levelup_channel_id=None,
-    lvl10=8,
-    lvl25=9,
-    lvl50=10,
-    lvl100=11,
+    levelup_channel_id=None, #Leveling deaktiviert
+    lvl10=None,
+    lvl25=None,
+    lvl50=None,
+    lvl100=None,
     vote_channel_id=12
 )
 
