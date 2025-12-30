@@ -50,12 +50,11 @@ HOUSE_OF_DEMONS = GuildConfig(
     vote_channel_id=1454573899621859430,
 )
 
-
 NACHTBUS = GuildConfig(
     guild_id=1363137083148865598,
-    open_category_id=1455657508432642199,
-    claimed_category_id=1455657541244682240,
-    closed_category_id=1455657528380756191,
+    open_category_id=1455652643488661738,
+    claimed_category_id=1455653203994607792,
+    closed_category_id=1455655553404764180,
     log_channel_id=1411140003874213948,
     team_role_id=1363149195279732829,
     admin_role_id=1363148778370240702,
@@ -69,12 +68,20 @@ NACHTBUS = GuildConfig(
 )
 
 INFINITY_EMPIRE = GuildConfig(
-    guild_id=888888888888888888,
-    open_category_id=10,
-    claimed_category_id=20,
-    closed_category_id=30,
-    log_channel_id=40,
-    team_role_id=50,
+    guild_id=1437819512798969990,
+    open_category_id=1455672590642315295,
+    claimed_category_id=1455672703767023820,
+    closed_category_id=1455672540830761031,
+    log_channel_id=1455672942104019198,
+    team_role_id=1437820265814954117,
+    admin_role_id=1437819823752216607,
+    member_role_id=1437824535389802496,
+    levelup_channel_id=None,
+    lvl10=1455673508754362478,
+    lvl25=1455673703693156585,
+    lvl50=1455673792226529282,
+    lvl100=1455673859373142199,
+    vote_channel_id=1455674287095812282
 )
 
 ALL_GUILDS = {
