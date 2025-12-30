@@ -6,6 +6,7 @@ import dotenv
 beta = False
 crashed = False
 
+
 dotenv.load_dotenv()
 if beta == True:
     TOKEN = os.getenv("DISCORD_BETA_TOKEN")

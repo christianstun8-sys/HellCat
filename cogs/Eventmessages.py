@@ -72,6 +72,7 @@ class BoostMessage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.Cog.listener()
     async def on_guild_update(self, before, after):
         if before.premium_subscription_count < after.premium_subscription_count:

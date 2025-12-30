@@ -35,6 +35,7 @@ class LeaderboardView(discord.ui.View):
         self.current_page -= 1
         await self.update_leaderboard(interaction)
 
+
     @discord.ui.button(label="Weiter →", style=discord.ButtonStyle.blurple)
     async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         if interaction.user != self.interaction.user:

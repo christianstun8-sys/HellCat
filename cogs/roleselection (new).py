@@ -209,6 +209,7 @@ class RoleSelectionView(discord.ui.View):
         self.data['channel_id'] = select.values[0].id
         await interaction.response.edit_message(content=f"✅ Kanal {select.values[0].mention} ausgewählt.", view=self)
 
+
     @discord.ui.button(label="Speichern & Senden", style=discord.ButtonStyle.green)
     async def finalize(self, interaction: discord.Interaction, button: discord.ui.Button):
         if 'channel_id' not in self.data:

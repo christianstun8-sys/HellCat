@@ -50,6 +50,7 @@ HOUSE_OF_DEMONS = GuildConfig(
     vote_channel_id=1454573899621859430,
 )
 
+
 NACHTBUS = GuildConfig(
     guild_id=1363137083148865598,
     open_category_id=1455657508432642199,
