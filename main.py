@@ -3,8 +3,17 @@ import discord
 from discord.ext import commands
 import dotenv
 
+beta = True
+crashed = False
+
 dotenv.load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+if beta:
+    TOKEN = os.getenv("DISCORD_BETA_TOKEN")
+elif beta == False:
+    TOKEN = os.getenv("DISCORD_TOKEN")
+else:
+    print("Beta Function not defined. Stopping...")
+    crashed = True
 
 intents = discord.Intents.all()
 
@@ -30,10 +39,15 @@ class HellCat(commands.Bot):
         if done:
             print("✅ Alle Cogs geladen!")
 
+        if beta:
+            synced = await self.tree.sync()
+            print(f"[BETA] Erfolgreich {len(synced)} Slash-Befehle synchronisiert")
+
     async def on_ready(self):
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Macht die Hölle heiß! 😈🔥"))
         print(f"Bot eingeloggt als {self.user}")
         print("------------------------------")
 
-bot = HellCat()
-bot.run(TOKEN)
+if not crashed:
+    bot = HellCat()
+    bot.run(TOKEN)

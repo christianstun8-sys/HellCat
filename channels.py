@@ -51,12 +51,20 @@ HOUSE_OF_DEMONS = GuildConfig(
 )
 
 NACHTBUS = GuildConfig(
-    guild_id=999999999999999999,
+    guild_id=1363137083148865598,
     open_category_id=1,
     claimed_category_id=2,
     closed_category_id=3,
-    log_channel_id=4,
-    team_role_id=5,
+    log_channel_id=1411140003874213948,
+    team_role_id=1363149195279732829,
+    admin_role_id=1363148778370240702,
+    member_role_id=1363152209164107826,
+    levelup_channel_id=None,
+    lvl10=8,
+    lvl25=9,
+    lvl50=10,
+    lvl100=11,
+    vote_channel_id=12
 )
 
 INFINITY_EMPIRE = GuildConfig(

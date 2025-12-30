@@ -9,6 +9,8 @@ import io
 
 import channels
 
+EXCLUDED_GUILD_ID = 1363137083148865598
+
 class LeaderboardView(discord.ui.View):
     def __init__(self, cog, total_users, interaction, embed_color):
         super().__init__(timeout=180)
@@ -74,7 +76,6 @@ class Leveling(commands.Cog):
         self.bot.loop.create_task(self.setup_db())
         self.voice_xp_task.start()
 
-
     async def setup_db(self):
         self.db = await aiosqlite.connect(self.db_name)
         await self.db.execute("""
@@ -89,7 +90,7 @@ class Leveling(commands.Cog):
                                                                     current_streak INTEGER DEFAULT 0,
                                                                     last_streak_date TEXT,
                                                                     PRIMARY KEY (guild_id, user_id)
-                                  )
+                              )
                               """)
         await self.db.commit()
 
@@ -127,7 +128,6 @@ class Leveling(commands.Cog):
         return xp, level, daily_messages, daily_voice_minutes, current_streak, last_streak_date
 
     async def _check_and_assign_level_role(self, member: discord.Member, new_level: int):
-        """Weist dynamisch die höchste verfügbare Levelrolle basierend auf channels.py zu."""
         config = channels.get_config(member.guild.id)
         if not config or not member.guild.me.guild_permissions.manage_roles:
             return
@@ -202,7 +202,7 @@ class Leveling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.author.bot or not message.guild or not self.db:
+        if message.author.bot or not message.guild or not self.db or message.guild.id == EXCLUDED_GUILD_ID:
             return
 
         guild_id, user_id = message.guild.id, message.author.id
@@ -244,6 +244,10 @@ class Leveling(commands.Cog):
 
         xp_multiplier = self.get_xp_multiplier()
         for guild in self.bot.guilds:
+            # Skip the excluded guild in the loop
+            if guild.id == EXCLUDED_GUILD_ID:
+                continue
+
             for member in guild.members:
                 if member.voice and member.voice.channel and not member.bot and not member.voice.self_mute:
                     xp, level, dm, dvm, streak, lsd = await self._get_user_data_and_reset_daily_limits(guild.id, member.id)
@@ -274,6 +278,9 @@ class Leveling(commands.Cog):
 
     @discord.app_commands.command(name="leaderboard", description="Zeigt das Level-Ranking an.")
     async def leaderboard_command(self, interaction: discord.Interaction):
+        if interaction.guild_id == EXCLUDED_GUILD_ID:
+            return await interaction.response.send_message("Das Level-System ist auf diesem Server deaktiviert.", ephemeral=True)
+
         await interaction.response.defer()
         async with self.db.execute("SELECT COUNT(*) FROM levels WHERE guild_id = ?", (interaction.guild_id,)) as cursor:
             total = (await cursor.fetchone())[0]
@@ -321,6 +328,9 @@ class Leveling(commands.Cog):
 
     @discord.app_commands.command(name="rank", description="Zeigt deinen Level-Fortschritt an.")
     async def rank_command(self, interaction: discord.Interaction, member: discord.Member = None):
+        if interaction.guild_id == EXCLUDED_GUILD_ID:
+            return await interaction.response.send_message("Das Level-System ist auf diesem Server deaktiviert.", ephemeral=True)
+
         await interaction.response.defer()
         user = member or interaction.user
         xp, lvl, dm, dvm, streak, lsd = await self._get_user_data_and_reset_daily_limits(interaction.guild_id, user.id)
