@@ -64,7 +64,7 @@ NACHTBUS = GuildConfig(
     lvl25=None,
     lvl50=None,
     lvl100=None,
-    vote_channel_id=12
+    vote_channel_id=1450141219857633502
 )
 
 INFINITY_EMPIRE = GuildConfig(
