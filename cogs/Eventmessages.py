@@ -23,7 +23,7 @@ class WelcomeMessage(commands.Cog):
                 color=discord.Color.orange()
             )
 
-        wembed.set_thumbnail(url=member.avatar_url)
+        wembed.set_thumbnail(url=member.display_avatar)
         await guild.system_channel.send(embed=wembed)
 
 
@@ -51,7 +51,7 @@ class ByeMessage(commands.Cog):
                     description=f"Die Person {member.name} wurde von dem Server gebannt.",
                     color=discord.Color.dark_red()
                 )
-            bembed.set_thumbnail(url=member.avatar_url)
+            bembed.set_thumbnail(url=member.display_avatar)
             await guild.system_channel.send(embed=bembed)
 
         else:
@@ -61,7 +61,7 @@ class ByeMessage(commands.Cog):
                     description=f"{member.name} hat uns allein stehen lassen...",
                     color=discord.Color.red()
                 )
-            bembed.set_thumbnail(url=member.avatar_url)
+            bembed.set_thumbnail(url=member.display_avatar)
 
             await guild.system_channel.send(embed=bembed)
 
@@ -86,7 +86,7 @@ class BoostMessage(commands.Cog):
                     description=f"Vielen Dank an {booster_member.mention} für den Boost! Wir schätzen deine Unterstützung sehr!",
                     color=discord.Color.dark_magenta()
                 )
-                embed.set_thumbnail(url=booster_member.avatar_url)
+                embed.set_thumbnail(url=booster_member.display_avatar)
                 await guild.system_channel.send(embed=embed, content=f"{booster_member.mention}")
 
 async def setup(bot):
