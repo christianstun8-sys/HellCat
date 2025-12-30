@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import dotenv
 
-beta = True
+beta = False
 crashed = False
 
 dotenv.load_dotenv()
