@@ -21,3 +21,6 @@ class deleteintroduction(commands.Cog):
                     await message.delete()
                 except discord.Forbidden:
                     print(f"I don't have permission to delete the message in channel {introduction_channel.name} by {member.name}.")
+
+async def setup(bot):
+    await bot.add_cog(deleteintroduction(bot))
