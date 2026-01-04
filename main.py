@@ -2,12 +2,12 @@ import os
 import discord
 from discord.ext import commands
 import dotenv
+
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_PREFIX"] = "hdev!"
 
 beta = False
 crashed = False
-
 
 dotenv.load_dotenv()
 if beta == True:
@@ -24,7 +24,7 @@ class HellCat(commands.Bot):
     def __init__(self):
         async def dynamic_prefix(bot, message):
             prefixes = ["h!"]
-            if bot.is_owner(message.author):
+            if await bot.is_owner(message.author):
                 prefixes.append("hdev!")
             return prefixes
 
@@ -33,10 +33,16 @@ class HellCat(commands.Bot):
         os.makedirs("databases", exist_ok=True)
         os.makedirs("data", exist_ok=True)
 
-
     async def setup_hook(self):
-        done = True
+        @self.command(name="restart", hidden=True)
+        async def restart_cmd(ctx):
+            if await self.is_owner(ctx.author):
+                await ctx.send("⌛ Starte neu... Das Panel wird den Bot gleich wieder hochfahren.")
+                await self.close()
+            else:
+                await ctx.send("Dafür hast du keine Berechtigung.")
 
+        done = True
         print("Starte Cogs-Ladevorgang...")
         for filename in os.listdir("cogs"):
             if filename.endswith(".py"):
@@ -51,18 +57,19 @@ class HellCat(commands.Bot):
 
         try:
             await self.load_extension('jishaku')
-            self.get_command('jsk').hidden = True
+            jsk = self.get_command('jsk')
+            if jsk:
+                jsk.hidden = True
             print("✅ Jishaku erfolgreich geladen!")
         except Exception as e:
             print(f"Fehler beim Laden von Jishaku: {e}")
-
 
         if beta:
             synced = await self.tree.sync()
             print(f"[BETA] Erfolgreich {len(synced)} Slash-Befehle synchronisiert")
 
     async def on_ready(self):
-        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Macht die Hölle heiß! 😈🔥"))
+        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Macht die Hölle heiß! 😈🔥"))
         print(f"Bot eingeloggt als {self.user}")
         print("------------------------------")
 
