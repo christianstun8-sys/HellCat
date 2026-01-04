@@ -37,7 +37,7 @@ class HellCat(commands.Bot):
         @self.command(name="restart", hidden=True)
         async def restart_cmd(ctx):
             if await self.is_owner(ctx.author):
-                await ctx.send("⌛ Starte neu... Das Panel wird den Bot gleich wieder hochfahren.")
+                await ctx.send("⌛ Starte neu...")
                 await self.close()
             else:
                 await ctx.send("Dafür hast du keine Berechtigung.")
