@@ -2,6 +2,8 @@ import os
 import discord
 from discord.ext import commands
 import dotenv
+os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
+os.environ["JISHAKU_PREFIX"] = "hdev!"
 
 beta = False
 crashed = False
@@ -20,7 +22,13 @@ intents = discord.Intents.all()
 
 class HellCat(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="h!", intents=intents, help_command=None)
+        async def dynamic_prefix(bot, message):
+            prefixes = ["h!"]
+            if bot.is_owner(message.author):
+                prefixes.append("hdev!")
+            return prefixes
+
+        super().__init__(command_prefix=dynamic_prefix, intents=intents, help_command=None)
         os.makedirs("cogs", exist_ok=True)
         os.makedirs("databases", exist_ok=True)
         os.makedirs("data", exist_ok=True)
@@ -37,8 +45,17 @@ class HellCat(commands.Bot):
                 except Exception as e:
                     print(f"❌ Fehler beim Laden von Cog '{filename[:-3]}': {e}")
                     done = False
+
         if done:
             print("✅ Alle Cogs geladen!")
+
+        try:
+            await self.load_extension('jishaku')
+            self.get_command('jsk').hidden = True
+            print("✅ Jishaku erfolgreich geladen!")
+        except Exception as e:
+            print(f"Fehler beim Laden von Jishaku: {e}")
+
 
         if beta:
             synced = await self.tree.sync()
