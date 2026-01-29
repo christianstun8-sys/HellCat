@@ -14,3 +14,6 @@ class RemoveN8BCommand(commands.Cog):
         else:
             target_guild.leave()
             ctx.channel.send("Hell Cat hat N8B verlassen.", delete_after=10)
+
+async def setup(bot):
+    await bot.add_cog(RemoveN8BCommand(bot))
