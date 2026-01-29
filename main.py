@@ -6,7 +6,10 @@ import dotenv
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_PREFIX"] = "hdev!"
 
+# --- Beta Config ---
 beta = False
+# -------------------
+
 crashed = False
 
 dotenv.load_dotenv()
@@ -40,7 +43,7 @@ class HellCat(commands.Bot):
                 await ctx.send("⌛ Starte neu...")
                 await self.close()
             else:
-                await ctx.send("Dafür hast du keine Berechtigung.")
+                return
 
         done = True
         print("Starte Cogs-Ladevorgang...")

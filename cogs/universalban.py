@@ -4,7 +4,6 @@ import channels
 
 TARGET_GUILDS = [
     channels.HOUSE_OF_DEMONS.guild_id,
-    channels.NACHTBUS.guild_id,
     channels.INFINITY_EMPIRE.guild_id
 ]
 
@@ -20,7 +19,7 @@ class UniversalBan(commands.Cog):
 
         ban_embed = discord.Embed(
             title="🔨 Universal-Bann",
-            description="Du wurdest aus dem Server-Netzwerk von House of Demons, Nachtbus und Infinity Empire ausgeschlossen.",
+            description="Du wurdest aus dem Server-Netzwerk von House of Demons und Infinity Empire ausgeschlossen.",
             color=discord.Color.red()
         )
         try:
