@@ -215,8 +215,11 @@ class Leveling(commands.Cog):
         if daily_messages < self.MAX_MESSAGES_PER_DAY:
             if daily_messages == 0:
                 today_date = datetime.now().date()
-                last_streak_dt = datetime.strptime(last_streak_date, '%Y-%m-%d').date()
-                yesterday = today_date - timedelta(days=1)
+                if last_streak_date is not None:
+                    last_streak_dt = datetime.strptime(last_streak_date, '%Y-%m-%d').date()
+                else:
+                    last_streak_dt = datetime.now().date()
+                    yesterday = today_date - timedelta(days=1)
 
                 if last_streak_dt == yesterday:
                     new_streak += 1
