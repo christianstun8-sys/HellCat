@@ -25,7 +25,7 @@ class UniversalBan(commands.Cog):
         try:
             await user.send(embed=ban_embed)
         except discord.Forbidden:
-            print(f"Konnte DM an {user.name} nicht senden.")
+            pass
 
         for guild_id in TARGET_GUILDS:
             if guild_id == guild.id:
