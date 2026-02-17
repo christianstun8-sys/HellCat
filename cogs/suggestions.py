@@ -223,7 +223,10 @@ class ModalButtonView(ui.View):
 class Panel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.db = bot.suggestions_db
+
+    @property
+    def db(self):
+        return self.bot.suggestions_db
 
     async def cog_load(self):
         await self.init_db()
