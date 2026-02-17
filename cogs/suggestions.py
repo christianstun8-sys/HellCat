@@ -127,33 +127,49 @@ class VoteView(ui.View):
         self.add_item(RejectButton())
 
 
+choice1 = discord.SelectOption(label="Ja", value="Du wirst beim Voting gezeigt.", emoji="👍", default=True)
+choice2 = discord.SelectOption(label="Nein", value="Du wirst nicht beim Voting gezeigt.", emoji="👍")
+
 class SuggestionForm(ui.Modal):
     def __init__(self, db: aiosqlite.Connection):
         super().__init__(title="Vorschlag zum Voting einreichen")
         self.db = db
 
         self.suggestion = ui.TextInput(
-            label="Vorschlag",
             placeholder="Bitte beschreibe deinen Vorschlag so detailliert wie möglich.",
             style=discord.TextStyle.long,
             required=True
         )
 
-        self.anonym = ui.TextInput(
-            label="Anonym?",
-            placeholder="Willst du anonym sein? Schreibe 'Ja' oder 'Nein'.",
-            style=discord.TextStyle.short,
+        self.anonym_new = ui.Select(
+            placeholder="Wähle aus...",
+            max_values=1,
             required=True,
-            min_length=2,
-            max_length=4
+            options=[
+                choice1,
+                choice2
+            ]
         )
 
-        self.add_item(self.suggestion)
-        self.add_item(self.anonym)
+        self.select_wrapper = ui.Label(
+            text="Name anzeigen?",
+            component=self.anonym_new
+        )
+
+        self.text_wrapper = ui.Label(
+            text="Vorschlag beschreiben",
+            component=self.suggestion
+        )
+
+        self.add_item(self.text_wrapper)
+        self.add_item(self.select_wrapper)
 
     async def on_submit(self, interaction: discord.Interaction):
         suggestion = self.suggestion.value
-        anonym = self.anonym.value.lower()
+        anonym = self.anonym_new.values[0]
+
+        if not anonym:
+            return await interaction.response.send_message("❌ Du hast keine Auswahl beim 2. Feld getroffen.", ephemeral=True)
 
         embed = discord.Embed(
             title="Neuer Vorschlag",
@@ -161,7 +177,7 @@ class SuggestionForm(ui.Modal):
             color=discord.Color.orange()
         )
 
-        if anonym == "nein":
+        if anonym == choice1.value:
             embed.set_author(
                 name=interaction.user.name,
                 icon_url=interaction.user.avatar.url,
@@ -180,7 +196,7 @@ class SuggestionForm(ui.Modal):
         await msg.edit(view=VoteView(self.db))
 
         await interaction.response.send_message(
-            "Dein Vorschlag wurde erfolgreich eingereicht!", ephemeral=True
+            f"✅ Dein Vorschlag wurde erfolgreich eingereicht und ist nun zum Voting in {channel.mention} veröffentlicht.", ephemeral=True
         )
 
 
@@ -229,7 +245,7 @@ class Panel(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def panel_suggestion(self, ctx):
         config = channels.get_config(ctx.guild.id)
-        if not config or not config.vote_channel_id:
+        if not 1442240558302236705:
             return await ctx.send("❌ Fehler: Server wurde nicht richtig konfiguriert (Vote-Channel fehlt)!", delete_after=10)
 
         voting_channel_id = config.vote_channel_id
