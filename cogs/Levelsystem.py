@@ -62,7 +62,7 @@ class Leveling(commands.Cog):
         self.bot = bot
         self.db_dir = Path(__file__).parent.parent / "databases"
         self.db_name = self.db_dir / 'levels.db'
-        self.db = None
+        self.db = bot.level_db
 
         self.MESSAGE_XP = 1
         self.VOICE_XP_PER_MINUTE = 2
@@ -74,11 +74,12 @@ class Leveling(commands.Cog):
         self.RANK_CARD_BACKGROUND_PATH = self.data_base_path / "rank_card_background.png"
         self.FONT_PATH = self.data_base_path / "arial.ttf"
 
-        self.bot.loop.create_task(self.setup_db())
         self.voice_xp_task.start()
 
+    async def cog_load(self):
+        await self.setup_db()
+
     async def setup_db(self):
-        self.db = await aiosqlite.connect(self.db_name)
         await self.db.execute("""
                               CREATE TABLE IF NOT EXISTS levels (
                                                                     guild_id INTEGER NOT NULL,
@@ -345,8 +346,6 @@ class Leveling(commands.Cog):
 
     async def cog_unload(self):
         self.voice_xp_task.cancel()
-        if self.db:
-            await self.db.close()
 
 async def setup(bot):
     await bot.add_cog(Leveling(bot))

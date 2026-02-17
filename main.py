@@ -2,6 +2,7 @@ import os
 import discord
 from discord.ext import commands
 import dotenv
+import aiosqlite
 
 os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
 os.environ["JISHAKU_PREFIX"] = "hdev!"
@@ -13,9 +14,9 @@ beta = False
 crashed = False
 
 dotenv.load_dotenv()
-if beta == True:
+if beta:
     TOKEN = os.getenv("DISCORD_BETA_TOKEN")
-elif beta == False:
+elif not beta:
     TOKEN = os.getenv("DISCORD_TOKEN")
 else:
     print("Beta Function not defined. Stopping...")
@@ -30,6 +31,9 @@ class HellCat(commands.Bot):
             if await bot.is_owner(message.author):
                 prefixes.append("hdev!")
             return prefixes
+        self.level_db = None
+        self.suggestions_db = None
+        self.tickets_db = None
 
         super().__init__(command_prefix=dynamic_prefix, intents=intents, help_command=None)
         os.makedirs("cogs", exist_ok=True)
@@ -37,6 +41,9 @@ class HellCat(commands.Bot):
         os.makedirs("data", exist_ok=True)
 
     async def setup_hook(self):
+        self.level_db = await aiosqlite.connect("databases/levels.db")
+        self.suggestions_db = await aiosqlite.connect("databases/suggestions.db")
+        self.tickets_db = await aiosqlite.connect("databases/tickets.db")
         @self.command(name="restart", hidden=True)
         async def restart_cmd(ctx):
             if await self.is_owner(ctx.author):

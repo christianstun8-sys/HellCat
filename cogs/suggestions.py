@@ -1,5 +1,4 @@
 from pathlib import Path
-
 import discord
 from discord.ext import commands
 from discord import ui
@@ -9,24 +8,9 @@ import asyncio
 
 import channels
 
-
 vote_cooldowns = {}
-BASE_DIR = Path(__file__).parent.parent / "databases"
-DB_DIR = BASE_DIR / "suggestions.db"
 
-async def init_db():
-    async with aiosqlite.connect(DB_DIR) as db:
-        await db.execute("""
-                         CREATE TABLE IF NOT EXISTS votes (
-                                                              message_id INTEGER,
-                                                              user_id INTEGER,
-                                                              vote INTEGER,
-                                                              PRIMARY KEY (message_id, user_id)
-                         )
-                         """)
-        await db.commit()
-
-async def update_vote(interaction: discord.Interaction, message_id: int, new_vote: int):
+async def update_vote(interaction: discord.Interaction, message_id: int, new_vote: int, db: aiosqlite.Connection):
     uid = interaction.user.id
     now = time.time()
 
@@ -39,26 +23,25 @@ async def update_vote(interaction: discord.Interaction, message_id: int, new_vot
 
     vote_cooldowns[uid] = now
 
-    async with aiosqlite.connect(DB_DIR) as db:
-        if new_vote == 0:
-            await db.execute(
-                "DELETE FROM votes WHERE message_id=? AND user_id=?",
-                (message_id, uid)
-            )
-        else:
-            await db.execute("""
-                             INSERT INTO votes (message_id, user_id, vote)
-                             VALUES (?, ?, ?)
+    if new_vote == 0:
+        await db.execute(
+            "DELETE FROM votes WHERE message_id=? AND user_id=?",
+            (message_id, uid)
+        )
+    else:
+        await db.execute("""
+                         INSERT INTO votes (message_id, user_id, vote)
+                         VALUES (?, ?, ?)
                              ON CONFLICT(message_id, user_id)
-                             DO UPDATE SET vote=excluded.vote
-                             """, (message_id, uid, new_vote))
+                         DO UPDATE SET vote=excluded.vote
+                         """, (message_id, uid, new_vote))
 
-        await db.commit()
+    await db.commit()
 
-        async with db.execute("SELECT vote FROM votes WHERE message_id=?", (message_id,)) as cursor:
-            rows = await cursor.fetchall()
-            upvotes = sum(1 for r in rows if r[0] == 1)
-            downvotes = sum(1 for r in rows if r[0] == -1)
+    async with db.execute("SELECT vote FROM votes WHERE message_id=?", (message_id,)) as cursor:
+        rows = await cursor.fetchall()
+        upvotes = sum(1 for r in rows if r[0] == 1)
+        downvotes = sum(1 for r in rows if r[0] == -1)
 
     embed = interaction.message.embeds[0]
     embed.set_field_at(
@@ -73,30 +56,33 @@ async def update_vote(interaction: discord.Interaction, message_id: int, new_vot
 
 
 class UpvoteButton(ui.Button):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(label="⬆️ Upvote", style=discord.ButtonStyle.success, custom_id="vote_up")
+        self.db = db
 
     async def callback(self, interaction):
         message_id = interaction.message.id
-        await update_vote(interaction, message_id, 1)
+        await update_vote(interaction, message_id, 1, self.db)
 
 
 class RemoveVoteButton(ui.Button):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(label="🤷 Vote entfernen", style=discord.ButtonStyle.secondary, custom_id="vote_remove")
+        self.db = db
 
     async def callback(self, interaction):
         message_id = interaction.message.id
-        await update_vote(interaction, message_id, 0)
+        await update_vote(interaction, message_id, 0, self.db)
 
 
 class DownvoteButton(ui.Button):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(label="⬇️ Downvote", style=discord.ButtonStyle.danger, custom_id="vote_down")
+        self.db = db
 
     async def callback(self, interaction):
         message_id = interaction.message.id
-        await update_vote(interaction, message_id, -1)
+        await update_vote(interaction, message_id, -1, self.db)
 
 
 class AcceptButton(ui.Button):
@@ -132,18 +118,19 @@ class RejectButton(ui.Button):
 
 
 class VoteView(ui.View):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(timeout=None)
-        self.add_item(UpvoteButton())
-        self.add_item(RemoveVoteButton())
-        self.add_item(DownvoteButton())
+        self.add_item(UpvoteButton(db))
+        self.add_item(RemoveVoteButton(db))
+        self.add_item(DownvoteButton(db))
         self.add_item(AcceptButton())
         self.add_item(RejectButton())
 
 
 class SuggestionForm(ui.Modal):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(title="Vorschlag zum Voting einreichen")
+        self.db = db
 
         self.suggestion = ui.TextInput(
             label="Vorschlag",
@@ -190,7 +177,7 @@ class SuggestionForm(ui.Modal):
         voting_channel_id = config.vote_channel_id
         channel = interaction.guild.get_channel(voting_channel_id)
         msg = await channel.send(embed=embed)
-        await msg.edit(view=VoteView())
+        await msg.edit(view=VoteView(self.db))
 
         await interaction.response.send_message(
             "Dein Vorschlag wurde erfolgreich eingereicht!", ephemeral=True
@@ -198,40 +185,52 @@ class SuggestionForm(ui.Modal):
 
 
 class ModalButton(ui.Button):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(
             label="Vorschlag einreichen",
             style=discord.ButtonStyle.success,
             custom_id="modal_open",
             emoji="📫"
         )
+        self.db = db
 
     async def callback(self, interaction):
-        await interaction.response.send_modal(SuggestionForm())
+        await interaction.response.send_modal(SuggestionForm(self.db))
 
 
 class ModalButtonView(ui.View):
-    def __init__(self):
+    def __init__(self, db: aiosqlite.Connection):
         super().__init__(timeout=None)
-        self.add_item(ModalButton())
+        self.add_item(ModalButton(db))
 
 
 class Panel(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        bot.add_view(ModalButtonView())
-        bot.add_view(VoteView())
-        bot.loop.create_task(init_db())
+        self.db = bot.suggestions_db
+
+    async def cog_load(self):
+        await self.init_db()
+        self.bot.add_view(ModalButtonView(self.db))
+        self.bot.add_view(VoteView(self.db))
+
+    async def init_db(self):
+        await self.db.execute("""
+                              CREATE TABLE IF NOT EXISTS votes (
+                                                                   message_id INTEGER,
+                                                                   user_id INTEGER,
+                                                                   vote INTEGER,
+                                                                   PRIMARY KEY (message_id, user_id)
+                                  )
+                              """)
+        await self.db.commit()
 
     @commands.command(name="panel-suggestion")
     @commands.has_permissions(administrator=True)
     async def panel_suggestion(self, ctx):
-
         config = channels.get_config(ctx.guild.id)
-        if not config or not config.member_role_id:
-            ctx.send("❌ Fehler: Server wurde nicht richtig konfiguiert!", delete_after=10)
-            asyncio.sleep(10)
-            ctx.message.delete()
+        if not config or not config.vote_channel_id:
+            return await ctx.send("❌ Fehler: Server wurde nicht richtig konfiguriert (Vote-Channel fehlt)!", delete_after=10)
 
         voting_channel_id = config.vote_channel_id
 
@@ -248,7 +247,7 @@ class Panel(commands.Cog):
             color=discord.Color.dark_red()
         )
 
-        await ctx.send(embed=embed, view=ModalButtonView())
+        await ctx.send(embed=embed, view=ModalButtonView(self.db))
 
 
 async def setup(bot):
