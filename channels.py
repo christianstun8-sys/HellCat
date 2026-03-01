@@ -17,6 +17,8 @@ class GuildConfig:
             lvl50: int | None = None,
             lvl100: int | None = None,
             vote_channel_id: int | None = None,
+            ban_forum_channel_id: int | None = None,
+            counting_channel_id: int | None = None,
     ):
         self.guild_id = guild_id
         self.OPEN_CATEGORY_ID = open_category_id
@@ -32,6 +34,8 @@ class GuildConfig:
         self.lvl50 = lvl50
         self.lvl100 = lvl100
         self.vote_channel_id = vote_channel_id
+        self.ban_forum_channel_id = ban_forum_channel_id
+        self.counting_channel_id = counting_channel_id
 
 HOUSE_OF_DEMONS = GuildConfig(
     guild_id=1181909214537461840,
@@ -48,6 +52,8 @@ HOUSE_OF_DEMONS = GuildConfig(
     lvl50=1454436249854283776,
     lvl100=1454436333773914153,
     vote_channel_id=1454573899621859430,
+    ban_forum_channel_id=None,
+    counting_channel_id=1263462595755642921
 )
 
 INFINITY_EMPIRE = GuildConfig(
