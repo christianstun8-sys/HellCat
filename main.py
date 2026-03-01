@@ -37,7 +37,6 @@ class HellCat(commands.Bot):
         self.counting_db = None
 
         super().__init__(command_prefix=dynamic_prefix, intents=intents, help_command=None)
-        self.twitch_bot = Twitchbot()
         os.makedirs("cogs", exist_ok=True)
         os.makedirs("databases", exist_ok=True)
         os.makedirs("data", exist_ok=True)
@@ -47,7 +46,6 @@ class HellCat(commands.Bot):
         self.suggestions_db = await aiosqlite.connect("databases/suggestions.db")
         self.tickets_db = await aiosqlite.connect("databases/tickets.db")
         self.counting_db = await aiosqlite.connect("databases/counting.db")
-        self.loop.create_task(self.twitch_bot.start(token=os.getenv("ACCESS_TOKEN")))
         @self.command(name="restart", hidden=True)
         async def restart_cmd(ctx):
             if await self.is_owner(ctx.author):
