@@ -128,7 +128,7 @@ class VoteView(ui.View):
 
 
 choice1 = discord.SelectOption(label="Ja", value="Du wirst beim Voting gezeigt.", emoji="👍", default=True)
-choice2 = discord.SelectOption(label="Nein", value="Du wirst nicht beim Voting gezeigt.", emoji="👍")
+choice2 = discord.SelectOption(label="Nein", value="Du wirst nicht beim Voting gezeigt.", emoji="👎")
 
 class SuggestionForm(ui.Modal):
     def __init__(self, db: aiosqlite.Connection):
@@ -157,7 +157,7 @@ class SuggestionForm(ui.Modal):
         )
 
         self.text_wrapper = ui.Label(
-            text="Vorschlag beschreiben",
+            text="Vo drschlag beschreiben",
             component=self.suggestion
         )
 
