@@ -34,6 +34,7 @@ class HellCat(commands.Bot):
         self.level_db = None
         self.suggestions_db = None
         self.tickets_db = None
+        self.counting_db = None
 
         super().__init__(command_prefix=dynamic_prefix, intents=intents, help_command=None)
         os.makedirs("cogs", exist_ok=True)
@@ -44,6 +45,7 @@ class HellCat(commands.Bot):
         self.level_db = await aiosqlite.connect("databases/levels.db")
         self.suggestions_db = await aiosqlite.connect("databases/suggestions.db")
         self.tickets_db = await aiosqlite.connect("databases/tickets.db")
+        self.counting_db = await aiosqlite.connect("databases/counting.db")
         @self.command(name="restart", hidden=True)
         async def restart_cmd(ctx):
             if await self.is_owner(ctx.author):
@@ -73,6 +75,8 @@ class HellCat(commands.Bot):
             print("✅ Jishaku erfolgreich geladen!")
         except Exception as e:
             print(f"Fehler beim Laden von Jishaku: {e}")
+
+
 
         if beta:
             synced = await self.tree.sync()
