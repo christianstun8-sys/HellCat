@@ -64,6 +64,9 @@ class CountingGame(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.guild.id is None:
+            return
+
         config = channels.get_config(message.guild.id)
         counting_channel_id = config.counting_channel_id
 
